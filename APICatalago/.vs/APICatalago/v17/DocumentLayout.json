@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\gagon\\source\\repos\\APICatalago\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{38996F63-ECCF-4EF1-84E5-A20C67BE7015}|APICatalago\\APICatalago.csproj|c:\\users\\gagon\\source\\repos\\apicatalago\\apicatalago\\models\\produto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38996F63-ECCF-4EF1-84E5-A20C67BE7015}|APICatalago\\APICatalago.csproj|solutionrelative:apicatalago\\models\\produto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Produto.cs",
+              "DocumentMoniker": "C:\\Users\\gagon\\source\\repos\\APICatalago\\APICatalago\\Models\\Produto.cs",
+              "RelativeDocumentMoniker": "APICatalago\\Models\\Produto.cs",
+              "ToolTip": "C:\\Users\\gagon\\source\\repos\\APICatalago\\APICatalago\\Models\\Produto.cs",
+              "RelativeToolTip": "APICatalago\\Models\\Produto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-25T00:21:58.149Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
