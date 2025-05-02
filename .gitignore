@@ -1,0 +1,26 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/APICatalago/.vs/APICatalago/DesignTimeBuild/.dtbcache.v2
+/APICatalago/.vs/APICatalago/FileContentIndex/*.vsidx
+/APICatalago/.vs/APICatalago/FileContentIndex/*
+/APICatalago/.vs/APICatalago/FileContentIndex/7031b6f6-7e94-4b0c-8718-e9ed201103c4.vsidx
+/APICatalago/.vs/APICatalago/FileContentIndex/cd88afd1-6303-4b76-b320-738c6042598c.vsidx
+/APICatalago/.vs/APICatalago/v17/.suo
+/APICatalago/.vs/APICatalago/v17/DocumentLayout.json
+/APICatalago/.vs/*
+
+*.dll
+/APICatalago/APICatalago/bin/*
+/APICatalago/APICatalago/obj/Debug/*
+/APICatalago/APICatalago/obj/Debug/net8.0/refint/APICatalago.dll
+/APICatalago/APICatalago/obj/Debug/net8.0/APICatalago.AssemblyInfo.cs
+/APICatalago/APICatalago/obj/Debug/net8.0/*.cache
+
+.env
+/APICatalago/APICatalago/obj/APICatalago.csproj.nuget.dgspec.json
+/APICatalago/APICatalago/obj/APICatalago.csproj.nuget.g.props
+/APICatalago/APICatalago/obj/APICatalago.csproj.nuget.g.targets
+/APICatalago/APICatalago/obj/project.assets.json
+/APICatalago/APICatalago/obj/project.nuget.cache
