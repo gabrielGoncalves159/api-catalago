@@ -9,4 +9,8 @@ public class Produto
     public string? ImagemUrl { get; set; }
     public float Estoque { get; set; }
     public DateTime DataCadastro { get; set; }
+
+    // Essa propriedade faz a reação nx1 com a tabela categoria
+    public int CategoriaId { get; set; }
+    public Categoria? Categoria { get; set; }
 }
