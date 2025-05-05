@@ -34,3 +34,5 @@
 /APICatalago/APICatalago/bin/Debug/net8.0/appsettings.json
 /APICatalago/APICatalago/obj/Debug/net8.0/APICatalago.MvcApplicationPartsAssemblyInfo.cs
 *.targets
+/APICatalago/APICatalago/obj/Debug/net8.0/EndpointInfo/APICatalago.json
+/APICatalago/APICatalago/obj/Debug/net8.0/ApiEndpoints.json
