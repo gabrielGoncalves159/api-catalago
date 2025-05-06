@@ -1,9 +1,13 @@
 using APICatalago.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//Correção de erro por referencia ciclica
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 // Configuração para mapeamento dos controllers "AddControllers" e "MapControllers"
 builder.Services.AddControllers();

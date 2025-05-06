@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace APICatalago.Models;
 
@@ -30,5 +31,7 @@ public class Produto
 
     // Essa propriedade faz a reação nx1 com a tabela categoria
     public int CategoriaId { get; set; }
+
+    [JsonIgnore]
     public Categoria? Categoria { get; set; }
 }
