@@ -1,4 +1,5 @@
 using APICatalago.Context;
+using APICatalago.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -21,17 +22,17 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(mySqlCon
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline, nesse ponto configurace os Middlewaree que o programa ira utiliza.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

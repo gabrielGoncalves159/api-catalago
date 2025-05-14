@@ -17,13 +17,13 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> ConsultaProdutos()
+        public async Task<ActionResult<IEnumerable<Produto>>> ConsultaProdutos()
         {
             try
             {
                 //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
                 //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
-                var produtos = _context.Produtos.AsNoTracking().ToList();
+                var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
                 if (!produtos.Any())
                 {
                     return NotFound("Produtos não encontrados...");
@@ -36,12 +36,15 @@ namespace APICatalago.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<Produto> ConsultaProduto(int id)
+        // Para evitar acesso de rotas desnecessarias foi colocado o parâmetro "min(1)", essa parâmetro é uma restrição de rota,
+        // ele limita um valor mínimo para a chamada da rota, nesse caso, se for passado um id = 0, não é realizado o acesso a rota.
+        // A restrição de rota é utilizada para distinguir rotas parecidas
+        [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
+        public async Task<ActionResult<Produto>> ConsultaProduto(int id)
         {
             try
             {
-                var produto = _context.Produtos.FirstOrDefault(x => x.ProdutoId == id);
+                var produto = await _context.Produtos.FirstOrDefaultAsync(x => x.ProdutoId == id);
                 if (produto is null)
                 {
                     return NotFound($"Produto com id = {id} não encontrado...");
