@@ -11,10 +11,12 @@ namespace APICatalago.Controllers
     public class CategoriasControllers : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriasControllers(AppDbContext context)
+        public CategoriasControllers(AppDbContext context, ILogger<CategoriasControllers> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet("produtos")]
@@ -37,18 +39,24 @@ namespace APICatalago.Controllers
         {
             try
             {
+                //Exemplos de utilização de logger
+                _logger.LogInformation("======================= GET catalago/ =========================");
+
                 //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
                 //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
                 var categorias = _context.Categorias.AsNoTracking().ToList();
                 if (!categorias.Any())
                 {
+                    _logger.LogInformation("======== Nenhum catalago encontrado ============");
                     return NotFound("Categorias não econtradas...");
                 }
 
+                _logger.LogInformation("======== Retornou catalago encontrado ============");
                 return categorias;
             }
             catch (Exception)
             {
+                _logger.LogInformation($"======== Um erro ocorrou na requisição de catalagos ============");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um problema ao tratar a sua solicitação.");
             }
         }

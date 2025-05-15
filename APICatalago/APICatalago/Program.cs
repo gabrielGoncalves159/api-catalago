@@ -1,5 +1,7 @@
 using APICatalago.Context;
 using APICatalago.Extensions;
+using APICatalago.Filters;
+using APICatalago.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -15,6 +17,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Definindo tempo de vida do servido para utilização do log
+builder.Services.AddScoped<ApiLoggingFilter>();
+
+builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information,
+}));
 
 // Código de instancia de contexto para acessar o Etinty Framework Core
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");

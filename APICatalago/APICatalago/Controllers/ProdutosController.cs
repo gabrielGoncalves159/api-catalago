@@ -1,4 +1,5 @@
 ﻿using APICatalago.Context;
+using APICatalago.Filters;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,7 @@ namespace APICatalago.Controllers
         // ele limita um valor mínimo para a chamada da rota, nesse caso, se for passado um id = 0, não é realizado o acesso a rota.
         // A restrição de rota é utilizada para distinguir rotas parecidas
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public async Task<ActionResult<Produto>> ConsultaProduto(int id)
         {
             try
