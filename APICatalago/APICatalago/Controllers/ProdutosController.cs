@@ -1,5 +1,6 @@
 ﻿using APICatalago.Context;
 using APICatalago.Filters;
+using APICatalago.Interfaces;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,24 +13,24 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProdutoRepository _repository;
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(IProdutoRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produto>>> ConsultaProdutos()
+        public ActionResult<IEnumerable<Produto>> ConsultaProdutos()
         {
             //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
             //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
-            var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
+            var produtos = _repository.GetProdutos();
             if (!produtos.Any())
             {
                 return NotFound("Produtos não encontrados...");
             }
-            return produtos;
+            return Ok(produtos);
         }
 
         // Para evitar acesso de rotas desnecessarias foi colocado o parâmetro "min(1)", essa parâmetro é uma restrição de rota,
@@ -37,14 +38,14 @@ namespace APICatalago.Controllers
         // A restrição de rota é utilizada para distinguir rotas parecidas
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<Produto>> ConsultaProduto(int id)
+        public ActionResult<Produto> ConsultaProduto(int id)
         {
-            var produto = await _context.Produtos.FirstOrDefaultAsync(x => x.ProdutoId == id);
+            var produto = _repository.GetProduto(id);
             if (produto is null)
             {
                 return NotFound($"Produto com id = {id} não encontrado...");
             }
-            return produto;
+            return Ok(produto);
         }
 
         [HttpPost]
@@ -52,10 +53,9 @@ namespace APICatalago.Controllers
         {
             if (produto is null) return BadRequest("Dados enviados são inválidos!");
 
-            _context.Add(produto);
-            _context.SaveChanges();
+            var novoProduto = _repository.Create(produto);
 
-            return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
+            return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
         }
 
         [HttpPut("{id:int}")]
@@ -66,25 +66,33 @@ namespace APICatalago.Controllers
                 return BadRequest("Dados enviados são inválidos!");
             }
 
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
+            var alterouProduto = _repository.Update(produto);
 
-            return Ok(produto);
+            if (alterouProduto)
+            {
+                return Ok(alterouProduto);
+            }
+            else
+            {
+                return StatusCode(500, $"Falha ao atualizar o produto de id = {id}");
+            }
+
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult ExcluirProduto(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(x => x.ProdutoId == id);
-            if (produto is null)
+            var deletado = _repository.Delete(id);
+
+            if (deletado)
             {
-                return NotFound($"Produto com id = {id} não encontrado para exclusão...");
+                return Ok($"Produto de id={id} foi excluído");
+            }
+            else
+            {
+                return StatusCode(500, $"Falha ao excluir o produto com id= {id}");
             }
 
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
-
-            return Ok(produto);
         }
     }
 }

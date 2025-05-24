@@ -1,6 +1,6 @@
 ﻿using APICatalago.Models;
 
-namespace APICatalago.Repositories
+namespace APICatalago.Interfaces
 {
     public interface ICategoriaRepository
     {

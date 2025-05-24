@@ -1,7 +1,7 @@
 ﻿
 using APICatalago.Context;
+using APICatalago.Interfaces;
 using APICatalago.Models;
-using APICatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

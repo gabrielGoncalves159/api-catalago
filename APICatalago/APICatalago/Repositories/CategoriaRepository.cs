@@ -1,4 +1,5 @@
 ﻿using APICatalago.Context;
+using APICatalago.Interfaces;
 using APICatalago.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,9 @@ namespace APICatalago.Repositories
 
         public IEnumerable<Categoria> GetCategorias()
         {
+            //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
+            //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
+
             //TODO: Nesse trecho de código o ideal é realizar uma filtragem, nunca retornar todos os registros de uma vez, isso resulta
             // em problema de desenpanho, nesse capo pode-se utilizar o método 'Where()' para realizar um filtro
             return _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();
