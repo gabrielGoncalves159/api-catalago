@@ -1,6 +1,7 @@
 ﻿
 using APICatalago.Context;
 using APICatalago.Models;
+using APICatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,21 +11,27 @@ namespace APICatalago.Controllers
     [ApiController]
     public class CategoriasControllers : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoriaRepository _repository;
         private readonly ILogger _logger;
 
-        public CategoriasControllers(AppDbContext context, ILogger<CategoriasControllers> logger)
+        public CategoriasControllers(ICategoriaRepository repository, ILogger<CategoriasControllers> logger)
         {
-            _context = context;
+            _repository = repository;
             _logger = logger;
         }
 
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> ConsultaCategoriasProdutos()
         {
-            //TODO: Nesse trecho de código o ideal é realizar uma filtragem, nunca retornar todos os registros de uma vez, isso resulta
-            // em problema de desenpanho, nesse capo pode-se utilizar o método 'Where()' para realizar um filtro
-            return _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();
+            var categorias = _repository.GetCategoriasProdutos();
+
+            if (!categorias.Any())
+            {
+                return NotFound("Categorias dos produtos não encontradas...");
+            }
+
+
+            return Ok(categorias);
         }
 
         [HttpGet]
@@ -33,9 +40,7 @@ namespace APICatalago.Controllers
             //Exemplos de utilização de logger
             _logger.LogInformation("======================= GET catalago/ =========================");
 
-            //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
-            //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
-            var categorias = _context.Categorias.AsNoTracking().ToList();
+            var categorias = _repository.GetCategorias();
             if (!categorias.Any())
             {
                 _logger.LogInformation("======== Nenhum catalago encontrado ============");
@@ -43,19 +48,19 @@ namespace APICatalago.Controllers
             }
 
             _logger.LogInformation("======== Retornou catalago encontrado ============");
-            return categorias;
+            return Ok(categorias);
         }
 
         [HttpGet("{id:int}", Name= "ObterCategoria")]
         public ActionResult<Categoria> ConsultaCategoria(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(c => c.CategoriaId == id);
+            var categoria = _repository.GetCategoria(id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-            return categoria;
+            return Ok(categoria);
         }
 
         [HttpPost]
@@ -63,10 +68,9 @@ namespace APICatalago.Controllers
         {
             if (categoria == null) return BadRequest("Dados enviados são inválidos!");
 
-            _context.Add(categoria);
-            _context.SaveChanges();
+            var categoriaCriada = _repository.Create(categoria);
 
-            return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoria);
         }
 
         [HttpPut("{id:int}")]
@@ -77,25 +81,23 @@ namespace APICatalago.Controllers
                 return BadRequest("Dados enviados são inválidos!");
             }
 
-            _context.Entry(categoria).State = EntityState.Modified;
-            _context.SaveChanges();
+            var categoriaAlterada = _repository.Update(categoria);
 
-            return Ok(categoria);
+            return Ok(categoriaAlterada);
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult ExcluiCategoria(int id) 
         {
-            var categoria = _context.Categorias.FirstOrDefault(x => x.CategoriaId == id);
+            var categoria = _repository.GetCategoria(id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-            _context.Categorias.Remove(categoria);
-            _context.SaveChanges();
+            var categoriaExcluida = _repository.Delete(id);
 
-            return Ok(categoria);
+            return Ok(categoriaExcluida);
         }
     }
 }

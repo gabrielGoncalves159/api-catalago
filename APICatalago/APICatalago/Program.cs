@@ -2,6 +2,7 @@ using APICatalago.Context;
 using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Logging;
+using APICatalago.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -21,6 +22,10 @@ builder.Services.AddSwaggerGen();
 
 //Definindo tempo de vida do servido para utilização do log
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+//Toda vez que ICategoriaRepository fore referenciada, passara a implementação definida em CategoriaRepository
+// para cada escopo de solicitação (request) será criada uma instancia isolada de CategoriaRepository
+builder.Services.AddScoped<ICategoriaRepository,CategoriaRepository>();
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {
