@@ -1,5 +1,8 @@
 ﻿using APICatalago.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+
+ // Não será mais usada o SaveChanges nesses arquivos, a classe UnitOfWork será responsavel por isso.
 
 namespace APICatalago.Interfaces
 {
@@ -14,7 +17,7 @@ namespace APICatalago.Interfaces
 
         public IEnumerable<T> GetAll()
         {
-            return _context.Set<T>().ToList(); 
+            return _context.Set<T>().AsNoTracking().ToList(); 
         }
 
         public T? Get(Expression<Func<T, bool>> predicate)
@@ -25,7 +28,7 @@ namespace APICatalago.Interfaces
         public T Create(T entity)
         {
             _context.Set<T>().Add(entity);
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
             return entity;
         }
@@ -33,7 +36,7 @@ namespace APICatalago.Interfaces
         public T Update(T entity)
         {
             _context.Set<T>().Update(entity);
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
             return entity;
         }
@@ -41,7 +44,7 @@ namespace APICatalago.Interfaces
         public T Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
-            _context.SaveChanges();
+            //_context.SaveChanges();
 
             return entity;
         }

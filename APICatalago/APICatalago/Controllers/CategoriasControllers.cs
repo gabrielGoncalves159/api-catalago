@@ -9,12 +9,12 @@ namespace APICatalago.Controllers
     [ApiController]
     public class CategoriasControllers : ControllerBase
     {
-        private readonly ICategoriaRepository _repository;
+        private readonly IUnitOfWork _ufw;
         private readonly ILogger _logger;
 
-        public CategoriasControllers(ICategoriaRepository repository, ILogger<CategoriasControllers> logger)
+        public CategoriasControllers(IUnitOfWork ufw, ILogger<CategoriasControllers> logger)
         {
-            _repository = repository;
+            _ufw = ufw;
             _logger = logger;
         }
 
@@ -24,7 +24,7 @@ namespace APICatalago.Controllers
             //Exemplos de utilização de logger
             _logger.LogInformation("======================= GET catalago/ =========================");
 
-            var categorias = _repository.GetAll();
+            var categorias = _ufw.CategoriaRepository.GetAll();
             if (!categorias.Any())
             {
                 _logger.LogInformation("======== Nenhum catalago encontrado ============");
@@ -38,7 +38,7 @@ namespace APICatalago.Controllers
         [HttpGet("{id:int}", Name= "ObterCategoria")]
         public ActionResult<Categoria> ConsultaCategoria(int id)
         {
-            var categoria = _repository.Get(c => c.CategoriaId == id);
+            var categoria = _ufw.CategoriaRepository.Get(c => c.CategoriaId == id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
@@ -52,7 +52,8 @@ namespace APICatalago.Controllers
         {
             if (categoria == null) return BadRequest("Dados enviados são inválidos!");
 
-            var categoriaCriada = _repository.Create(categoria);
+            var categoriaCriada = _ufw.CategoriaRepository.Create(categoria);
+            _ufw.Commit();
 
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoria);
         }
@@ -65,7 +66,8 @@ namespace APICatalago.Controllers
                 return BadRequest("Dados enviados são inválidos!");
             }
 
-            var categoriaAlterada = _repository.Update(categoria);
+            var categoriaAlterada = _ufw.CategoriaRepository.Update(categoria);
+            _ufw.Commit();
 
             return Ok(categoriaAlterada);
         }
@@ -73,13 +75,14 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult ExcluiCategoria(int id) 
         {
-            var categoria = _repository.Get(c => c.CategoriaId == id);
+            var categoria = _ufw.CategoriaRepository.Get(c => c.CategoriaId == id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-            var categoriaExcluida = _repository.Delete(categoria);
+            var categoriaExcluida = _ufw.CategoriaRepository.Delete(categoria);
+            _ufw.Commit();
 
             return Ok(categoriaExcluida);
         }

@@ -11,11 +11,11 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
+        private readonly IUnitOfWork _ufw;
 
-        public ProdutosController(IProdutoRepository repository)
+        public ProdutosController(IUnitOfWork ufw)
         {
-            _repository = repository;
+            _ufw = ufw;
         }
 
         [HttpGet]
@@ -23,7 +23,7 @@ namespace APICatalago.Controllers
         {
             //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
             //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
-            var produtos = _repository.GetAll();
+            var produtos = _ufw.ProdutoRepository.GetAll();
             if (!produtos.Any())
             {
                 return NotFound("Produtos não encontrados...");
@@ -38,7 +38,7 @@ namespace APICatalago.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<Produto> ConsultaProduto(int id)
         {
-            var produto = _repository.Get(c => c.ProdutoId == id);
+            var produto = _ufw.ProdutoRepository.Get(c => c.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound($"Produto com id = {id} não encontrado...");
@@ -49,7 +49,7 @@ namespace APICatalago.Controllers
         [HttpGet("produtos_categoria/{id}")]
         public ActionResult<IEnumerable<Produto>> ConsultaProdutosPorCategoria(int id)
         {
-            var produto = _repository.GetProdutosPorCategoria(id);
+            var produto = _ufw.ProdutoRepository.GetProdutosPorCategoria(id);
             if (produto is null)
             {
                 return NotFound($"Não foram encontrados produtos com categoria com id = {id}...");
@@ -62,7 +62,8 @@ namespace APICatalago.Controllers
         {
             if (produto is null) return BadRequest("Dados enviados são inválidos!");
 
-            var novoProduto = _repository.Create(produto);
+            var novoProduto = _ufw.ProdutoRepository.Create(produto);
+            _ufw.Commit();
 
             return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
         }
@@ -75,7 +76,8 @@ namespace APICatalago.Controllers
                 return BadRequest("Dados enviados são inválidos!");
             }
 
-            var produtoAtualizado = _repository.Update(produto);
+            var produtoAtualizado = _ufw.ProdutoRepository.Update(produto);
+            _ufw.Commit();
 
             return Ok(produtoAtualizado);
 
@@ -84,14 +86,16 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult ExcluirProduto(int id)
         {
-            var produto = _repository.Get(p => p.ProdutoId == id);
+            var produto = _ufw.ProdutoRepository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
             {
                 return NotFound($"Produto com id = {id} não encontrado...");
             }
 
-            var produtoDeletado = _repository.Delete(produto);
+            var produtoDeletado = _ufw.ProdutoRepository.Delete(produto);
+            _ufw.Commit();
+
             return Ok(produtoDeletado);
         }
     }
