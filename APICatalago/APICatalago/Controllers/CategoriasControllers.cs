@@ -1,9 +1,7 @@
 ﻿
-using APICatalago.Context;
 using APICatalago.Interfaces;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Controllers
 {
@@ -20,27 +18,13 @@ namespace APICatalago.Controllers
             _logger = logger;
         }
 
-        [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> ConsultaCategoriasProdutos()
-        {
-            var categorias = _repository.GetCategoriasProdutos();
-
-            if (!categorias.Any())
-            {
-                return NotFound("Categorias dos produtos não encontradas...");
-            }
-
-
-            return Ok(categorias);
-        }
-
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> ConsultaCategorias() 
         {
             //Exemplos de utilização de logger
             _logger.LogInformation("======================= GET catalago/ =========================");
 
-            var categorias = _repository.GetCategorias();
+            var categorias = _repository.GetAll();
             if (!categorias.Any())
             {
                 _logger.LogInformation("======== Nenhum catalago encontrado ============");
@@ -54,7 +38,7 @@ namespace APICatalago.Controllers
         [HttpGet("{id:int}", Name= "ObterCategoria")]
         public ActionResult<Categoria> ConsultaCategoria(int id)
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c => c.CategoriaId == id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
@@ -89,13 +73,13 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult ExcluiCategoria(int id) 
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c => c.CategoriaId == id);
             if (categoria == null)
             {
                 return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-            var categoriaExcluida = _repository.Delete(id);
+            var categoriaExcluida = _repository.Delete(categoria);
 
             return Ok(categoriaExcluida);
         }

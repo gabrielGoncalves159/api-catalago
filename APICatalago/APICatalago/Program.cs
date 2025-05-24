@@ -28,6 +28,7 @@ builder.Services.AddScoped<ApiLoggingFilter>();
 // para cada escopo de solicitação (request) será criada uma instancia isolada de CategoriaRepository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
 {

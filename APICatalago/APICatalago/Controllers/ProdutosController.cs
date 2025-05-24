@@ -1,11 +1,9 @@
-﻿using APICatalago.Context;
-using APICatalago.Filters;
+﻿using APICatalago.Filters;
 using APICatalago.Interfaces;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-// Os try/catch foram removimos porque esta sendo trato as exceções não esperadas no middleware ApiExceptionFilter
+// Os try/catch foram removimos porque esta sendo tratado as exceções não esperadas no middleware ApiExceptionFilter
 
 namespace APICatalago.Controllers
 {
@@ -25,7 +23,7 @@ namespace APICatalago.Controllers
         {
             //O AsNoTracking melhora o desempenho da consulta, eliminando o cache das entidades do contexto
             //Deve ser usado paneas em funções de leitura aonde eu não sei o estado atual dos objetos.
-            var produtos = _repository.GetProdutos();
+            var produtos = _repository.GetAll();
             if (!produtos.Any())
             {
                 return NotFound("Produtos não encontrados...");
@@ -40,10 +38,21 @@ namespace APICatalago.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<Produto> ConsultaProduto(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.Get(c => c.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound($"Produto com id = {id} não encontrado...");
+            }
+            return Ok(produto);
+        }
+
+        [HttpGet("produtos_categoria/{id}")]
+        public ActionResult<IEnumerable<Produto>> ConsultaProdutosPorCategoria(int id)
+        {
+            var produto = _repository.GetProdutosPorCategoria(id);
+            if (produto is null)
+            {
+                return NotFound($"Não foram encontrados produtos com categoria com id = {id}...");
             }
             return Ok(produto);
         }
@@ -66,33 +75,24 @@ namespace APICatalago.Controllers
                 return BadRequest("Dados enviados são inválidos!");
             }
 
-            var alterouProduto = _repository.Update(produto);
+            var produtoAtualizado = _repository.Update(produto);
 
-            if (alterouProduto)
-            {
-                return Ok(alterouProduto);
-            }
-            else
-            {
-                return StatusCode(500, $"Falha ao atualizar o produto de id = {id}");
-            }
+            return Ok(produtoAtualizado);
 
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult ExcluirProduto(int id)
         {
-            var deletado = _repository.Delete(id);
+            var produto = _repository.Get(p => p.ProdutoId == id);
 
-            if (deletado)
+            if (produto is null)
             {
-                return Ok($"Produto de id={id} foi excluído");
-            }
-            else
-            {
-                return StatusCode(500, $"Falha ao excluir o produto com id= {id}");
+                return NotFound($"Produto com id = {id} não encontrado...");
             }
 
+            var produtoDeletado = _repository.Delete(produto);
+            return Ok(produtoDeletado);
         }
     }
 }
