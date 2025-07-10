@@ -1,4 +1,6 @@
 ﻿
+using APICatalago.Dtos;
+using APICatalago.Dtos.Mappings;
 using APICatalago.Interfaces;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,7 @@ namespace APICatalago.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> ConsultaCategorias() 
+        public ActionResult<IEnumerable<CategoriaDTO>> ConsultaCategorias() 
         {
             //Exemplos de utilização de logger
             _logger.LogInformation("======================= GET catalago/ =========================");
@@ -32,11 +34,13 @@ namespace APICatalago.Controllers
             }
 
             _logger.LogInformation("======== Retornou catalago encontrado ============");
-            return Ok(categorias);
+
+            var categoriasDTO = categorias.ToCategoriaDTOList();
+            return Ok(categoriasDTO);
         }
 
         [HttpGet("{id:int}", Name= "ObterCategoria")]
-        public ActionResult<Categoria> ConsultaCategoria(int id)
+        public ActionResult<CategoriaDTO> ConsultaCategoria(int id)
         {
             var categoria = _ufw.CategoriaRepository.Get(c => c.CategoriaId == id);
             if (categoria == null)
@@ -44,36 +48,42 @@ namespace APICatalago.Controllers
                 return NotFound($"Categoria com id = {id} não encontrada...");
             }
 
-            return Ok(categoria);
+            var categoriaDTO = categoria.ToCategoriaDTO();
+            return Ok(categoriaDTO);
         }
 
         [HttpPost]
-        public ActionResult CadastraCategoria(Categoria categoria)
+        public ActionResult<CategoriaDTO> CadastraCategoria(CategoriaDTO dto)
         {
-            if (categoria == null) return BadRequest("Dados enviados são inválidos!");
+            if (dto == null) return BadRequest("Dados enviados são inválidos!");
 
+            var categoria = dto.ToCategoria();
             var categoriaCriada = _ufw.CategoriaRepository.Create(categoria);
             _ufw.Commit();
 
-            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaCriada.CategoriaId }, categoria);
+            var categoriaDTO = categoriaCriada.ToCategoriaDTO();
+
+            return new CreatedAtRouteResult("ObterCategoria", new { id = categoriaDTO?.CategoriaId }, categoriaDTO);
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult AlteraCategoria(int id, Categoria categoria)
+        public ActionResult<CategoriaDTO> AlteraCategoria(int id, CategoriaDTO dto)
         {
-            if (id != categoria.CategoriaId)
+            if (id != dto.CategoriaId)
             {
                 return BadRequest("Dados enviados são inválidos!");
             }
 
+            var categoria = dto.ToCategoria();
             var categoriaAlterada = _ufw.CategoriaRepository.Update(categoria);
             _ufw.Commit();
 
-            return Ok(categoriaAlterada);
+            var categoriaDTO = categoriaAlterada.ToCategoriaDTO();
+            return Ok(categoriaDTO);
         }
 
         [HttpDelete("{id:int}")]
-        public ActionResult ExcluiCategoria(int id) 
+        public ActionResult<CategoriaDTO> ExcluiCategoria(int id) 
         {
             var categoria = _ufw.CategoriaRepository.Get(c => c.CategoriaId == id);
             if (categoria == null)
@@ -84,6 +94,7 @@ namespace APICatalago.Controllers
             var categoriaExcluida = _ufw.CategoriaRepository.Delete(categoria);
             _ufw.Commit();
 
+            var categoriaDTO = categoriaExcluida.ToCategoriaDTO();
             return Ok(categoriaExcluida);
         }
     }

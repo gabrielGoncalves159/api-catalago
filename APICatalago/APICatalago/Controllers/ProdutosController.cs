@@ -1,6 +1,7 @@
 ﻿using APICatalago.Filters;
 using APICatalago.Interfaces;
 using APICatalago.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 // Os try/catch foram removimos porque esta sendo tratado as exceções não esperadas no middleware ApiExceptionFilter
@@ -12,10 +13,12 @@ namespace APICatalago.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly IUnitOfWork _ufw;
+        private readonly IMapper _mapper;
 
-        public ProdutosController(IUnitOfWork ufw)
+        public ProdutosController(IUnitOfWork ufw, IMapper mapper)
         {
             _ufw = ufw;
+            _mapper = mapper;
         }
 
         [HttpGet]
